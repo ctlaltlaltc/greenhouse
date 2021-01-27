@@ -1,0 +1,20 @@
+stages:
+- name: Build
+  steps:
+  - runScriptConfig:
+      image: registry.sangfor.com/proxy/library/maven:3.6.3-openjdk-15
+      shellScript: mvn clean install -Dmaven.test.skip=true
+- name: Publish
+  steps:
+  - publishImageConfig:
+      dockerfilePath: ./Dockerfile
+      buildContext: .
+      tag: registry.sangfor.com/apps/greenhouse:${CICD_EXECUTION_SEQUENCE}
+      pushRemote: true
+      registry: registry.sangfor.com
+- name: Deploy
+  steps:
+  - applyYamlConfig:
+      path: ./deployment.yaml
+timeout: 60
+notification: {}
